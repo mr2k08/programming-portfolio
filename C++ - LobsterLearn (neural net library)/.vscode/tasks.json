@@ -1,0 +1,42 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build LobsterLearn",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-funroll-loops",
+                "-flto",
+                "-std=c++17",
+                "-I${workspaceFolder}",
+                "-I/Users/marcrubeiz/cpp_libraries/eigen-3.4.0",
+                "main.cpp",
+                "-o",
+                "build/main"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Build LobsterLearn neural network (output → build/main)"
+        },
+        {
+            "label": "Build & Run LobsterLearn",
+            "type": "shell",
+            "command": "g++ -O3 -march=native -ffast-math -funroll-loops -flto -std=c++17 -I${workspaceFolder} -I/Users/marcrubeiz/cpp_libraries/eigen-3.4.0 main.cpp -o build/main && ./build/main",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Build and run LobsterLearn"
+        }
+    ]
+}

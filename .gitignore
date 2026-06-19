@@ -1,0 +1,21 @@
+# Compiled binaries / objects
+*.o
+*.out
+*.exe
+*.bin
+*.so
+output/
+build/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# Data / large artifacts
+data/
+*.zip

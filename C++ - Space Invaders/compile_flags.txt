@@ -1,0 +1,3 @@
+-std=c++17
+-Wall
+-I/opt/homebrew/include/SDL2
