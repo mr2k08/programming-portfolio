@@ -1,4 +1,3 @@
-from os import chdir
 from time import sleep
 
 from format import *

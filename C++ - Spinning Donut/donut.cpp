@@ -50,9 +50,7 @@ void render(float A, float B){
                 sinA * sintheta + cosB * (cosA * sintheta - costheta * sinA * sinphi);
                 int li = (int) (L * 8);
                 output[yp][xp] = (li < 0) ? ' ' : LUM[li > 11 ? 11 : li];
-
             }
-
         }
     }
     printf("\x1b[H");
