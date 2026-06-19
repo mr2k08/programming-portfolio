@@ -1,11 +1,8 @@
-# main.py
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QGridLayout, QMessageBox
 
-
 from game_logic import check_winner, update_pos
 from bot import botMove
-
 
 class MorpionUI(QWidget):
     """
@@ -15,13 +12,10 @@ class MorpionUI(QWidget):
         super().__init__()
         self.setWindowTitle("Morpion")
 
-        # Choix du mode de jeu
         self.two_player_mode = self.ask_game_mode()
 
-        # Plateau de jeu
         self.board = [[' ']*3 for _ in range(3)]
 
-        # Joueur courant (utile uniquement en mode 2 joueurs)
         self.current_player = 'x'
 
         self.layout = QGridLayout()
@@ -63,7 +57,6 @@ class MorpionUI(QWidget):
         if self.board[row_index][column_index] != ' ':
             return
 
-        # -------- MODE 2 JOUEURS --------
         if self.two_player_mode:
             update_pos(self.board, (row_index, column_index), self.current_player)
             self.update_ui(row_index, column_index, self.current_player)
@@ -76,11 +69,9 @@ class MorpionUI(QWidget):
                 self.end_game("égalité")
                 return
 
-            # Changement de joueur
             self.current_player = 'o' if self.current_player == 'x' else 'x'
             return
 
-        # -------- MODE 1 JOUEUR (BOT) --------
         update_pos(self.board, (row_index, column_index), 'x')
         self.update_ui(row_index, column_index, 'x')
 
@@ -133,7 +124,6 @@ class MorpionUI(QWidget):
                 button = self.buttons[row_index][column_index]
                 button.setText("")
                 button.setEnabled(True)
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

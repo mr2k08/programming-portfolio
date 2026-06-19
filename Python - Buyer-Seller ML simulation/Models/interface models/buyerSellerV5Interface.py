@@ -11,7 +11,6 @@ from PyQt6.QtWidgets import (
     QTableView, QMainWindow, QDialog, QTextBrowser, QStackedWidget, QSpinBox
 )
 
-# ===================== rule weights (align with buyerSellerV5) =====================
 FEATURE_WEIGHTS = {
     "deal_value_usd": 5,
     "dealval_buyerrev": 3,
@@ -25,7 +24,6 @@ FEATURE_WEIGHTS = {
 }
 BLEND_ALPHA = 0.35
 
-# ===================== helpers (match training schema) =====================
 def canon_buyer_region(val:str)->str:
     m = {"NA":"NORTH_AMERICA","APAC":"ASIA_PACIFIC","EU":"EUROPE","MEA":"MIDDLE_EAST_AFRICA","LATAM":"LATAM"}
     return m.get(str(val).upper(), "OTHER")
@@ -72,7 +70,6 @@ def build_features_row(s: pd.Series, b: pd.Series) -> dict:
         "stake": stake_bucket(stake),
     }
 
-# ===================== rule scoring helpers =====================
 def _minmax01(series: pd.Series) -> pd.Series:
     mn, mx = float(series.min()), float(series.max())
     if not np.isfinite(mn) or not np.isfinite(mx) or mx <= mn:
@@ -119,7 +116,6 @@ def compute_rule_score(df_raw: pd.DataFrame) -> pd.Series:
 
     return _minmax01(s)
 
-# ===================== Qt table window (fallback viewer) =====================
 class DataFrameModel(QAbstractTableModel):
     def __init__(self, df: pd.DataFrame):
         super().__init__()
@@ -145,7 +141,6 @@ class TableWindow(QMainWindow):
         self.setCentralWidget(view)
         self.resize(1100, 650)
 
-# ===================== Main GUI =====================
 class MatcherGUI(QWidget):
     def __init__(self):
         super().__init__()
@@ -159,7 +154,6 @@ class MatcherGUI(QWidget):
         self.cat_maps   = None
         self.last_details = None
 
-        # ---- file pickers (same UI, wider boxes) ----
         self.deals_path   = QLineEdit();  self.deals_path.setMinimumWidth(800)
         self.buyers_path  = QLineEdit();  self.buyers_path.setMinimumWidth(800)
         self.sellers_path = QLineEdit();  self.sellers_path.setMinimumWidth(800)
@@ -170,22 +164,19 @@ class MatcherGUI(QWidget):
         btn_buyers.clicked.connect(lambda: self._pick(self.buyers_path, "Excel Files (*.xlsx)"))
         btn_sellers.clicked.connect(lambda: self._pick(self.sellers_path, "Excel Files (*.xlsx)"))
 
-        # ---- mode + target ----
         self.mode = QComboBox(); self.mode.addItems(["Seller → Buyers", "Buyer → Sellers"])
         self.mode.setMinimumWidth(320)
         self.target = QLineEdit(); self.target.setPlaceholderText("Seller name (if Seller→Buyers) or Buyer ID (if Buyer→Sellers)")
         self.target.setMinimumWidth(800)
         try:
-            # Ensure text aligns left explicitly
             self.target.setAlignment(Qt.AlignmentFlag.AlignLeft)
         except Exception:
             pass
 
-        # ---- buttons ----
         btn_train  = QPushButton("Train (shows stats)")
         btn_rank   = QPushButton("Rank (only)")
         btn_clear  = QPushButton("Clear Output")
-        btn_detail = QPushButton("Open Top-N Details")  # exports XLSX, opens it, and prints
+        btn_detail = QPushButton("Open Top-N Details")
         btn_detail.setEnabled(False)
         btn_help   = QPushButton("How to Use")
         btn_train.clicked.connect(self.train_only)
@@ -195,14 +186,11 @@ class MatcherGUI(QWidget):
         btn_help.clicked.connect(self.show_help)
         self.btn_detail = btn_detail
 
-        # ---- Top-N selector ----
         self.top_n = QSpinBox(); self.top_n.setRange(1, 5000); self.top_n.setValue(10); self.top_n.setFixedWidth(90)
 
-        # ---- output ----
         self.out = QTextEdit(); self.out.setReadOnly(True)
         self.out.setStyleSheet("font-family: Menlo, Consolas, monospace; font-size: 12px;")
 
-        # ---- layout (identical grouping) ----
         files = QGroupBox("Files")
         fl = QFormLayout()
         fl.addRow(QLabel("Deals XLSX:"), self.deals_path); fl.addRow(btn_deals)
@@ -229,13 +217,12 @@ class MatcherGUI(QWidget):
         root = QVBoxLayout()
         root.addWidget(files); root.addWidget(cfg); root.addLayout(row); root.addWidget(self.out, 1)
 
-        # ----- Build Home + Matcher pages with simple navigation -----
         main_page = QWidget(); main_page.setLayout(root)
         home_page = self._build_home()
 
         self.pages = QStackedWidget()
-        self.pages.addWidget(home_page)   # index 0
-        self.pages.addWidget(main_page)   # index 1
+        self.pages.addWidget(home_page)
+        self.pages.addWidget(main_page)
 
         nav = QHBoxLayout()
         btn_home = QPushButton("Home")
@@ -249,13 +236,11 @@ class MatcherGUI(QWidget):
         top.addWidget(self.pages, 1)
         self.setLayout(top)
 
-        # storage for last run (for Top-N export)
         self.last_ranking = None
         self.last_details_df = None
         self.last_id_col = None
         self.last_title = None
 
-    # ---------- THEME (light / white background) ----------
     def _dark_blue_theme(self):
         pal = QPalette()
         pal.setColor(QPalette.ColorRole.Window, QColor(255,255,255))
@@ -285,7 +270,6 @@ class MatcherGUI(QWidget):
             QTextEdit { background:#ffffff; color:#111827; border:1px solid #cbd5e1; border-radius:6px; }
         """)
 
-    # ---------- utils ----------
     def _pick(self, line: QLineEdit, filt: str):
         p, _ = QFileDialog.getOpenFileName(self, "Select File", "", filt)
         if p: line.setText(p)
@@ -300,7 +284,6 @@ class MatcherGUI(QWidget):
         self.out.clear(); self.last_details=None; self.btn_detail.setEnabled(False)
         self.last_ranking = None; self.last_details_df = None; self.last_id_col = None; self.last_title = None
 
-    # ---------- help / how-to ----------
     def show_help(self):
         dlg = QDialog(self)
         dlg.setWindowTitle("How to Use — Deal Matcher")
@@ -357,7 +340,6 @@ class MatcherGUI(QWidget):
             """
         )
 
-    # ---------- home page ----------
     def _build_home(self) -> QWidget:
         w = QWidget()
         lay = QVBoxLayout(w)
@@ -365,7 +347,6 @@ class MatcherGUI(QWidget):
         intro.setOpenExternalLinks(True)
         intro.setStyleSheet("font-size: 16px;")
         intro.setHtml(self._home_html())
-        # Only keep a Manual button; remove redundant Open Matcher
         btn_manual = QPushButton("How to Use")
         btn_manual.clicked.connect(self.show_help)
         buttons = QHBoxLayout(); buttons.addStretch(1); buttons.addWidget(btn_manual); buttons.addStretch(1)
@@ -388,7 +369,6 @@ class MatcherGUI(QWidget):
             """
         )
 
-    # ===================== TRAIN (only) =====================
     def train_only(self):
         deals = self.deals_path.text().strip()
         if not deals: return self._err("Select a Deals XLSX.")
@@ -406,7 +386,6 @@ class MatcherGUI(QWidget):
         X = df.drop(columns=['success_flag'])
         y = df['success_flag'].astype(int)
 
-        # factorize any object columns; save categories for runtime mapping
         cat_maps = {}
         for c in X.columns:
             if X[c].dtype == 'object':
@@ -455,14 +434,12 @@ class MatcherGUI(QWidget):
         self.log(f"Log loss: {log_loss(y_te, proba):.4f}")
         self.log(f"ROC-AUC : {roc_auc_score(y_te, proba):.4f}")
 
-    # ===================== RANK (only) =====================
     def rank_only(self):
         buyers  = self.buyers_path.text().strip()
         sellers = self.sellers_path.text().strip()
         if not buyers or not sellers:
             return self._err("Select Buyers XLSX and Sellers XLSX.")
 
-        # load model + meta
         try:
             booster = lgb.Booster(model_file=self.model_file)
             with open(self.meta_file, "rb") as f:
@@ -471,7 +448,6 @@ class MatcherGUI(QWidget):
         except Exception as e:
             return self._err(f"Load model/meta failed. Train first.\n{e}")
 
-        # load runtime
         try:
             buyers_df  = pd.read_excel(buyers) if not buyers.lower().endswith('.csv') else pd.read_csv(buyers)
             if sellers.lower().endswith('.csv'):
@@ -481,7 +457,6 @@ class MatcherGUI(QWidget):
         except Exception as e:
             return self._err(f"Failed to read runtime files:\n{e}")
 
-        # mode + target
         mode   = 's' if self.mode.currentText().startswith("Seller") else 'b'
         target = self.target.text().strip()
         if not target: return self._err("Enter Target.")
@@ -505,25 +480,20 @@ class MatcherGUI(QWidget):
             title  = f"Top sellers for buyer: {anchor['buyer_id']}"
             details_df = sellers_df.copy()
 
-        # build features for all pairs
         rows = [build_features_row(s, b) for (s, b) in pairs]
         feat_raw = pd.DataFrame(rows)
-        # rule score from raw features
         rule_score = compute_rule_score(feat_raw)
         feat = feat_raw.copy()
 
-        # map categoricals with training maps
         for c, cats in cat_maps.items():
             if c in feat.columns:
                 mapping = {str(cat): i for i, cat in enumerate(cats)}
                 feat[c] = feat[c].astype(str).map(mapping).fillna(-1).astype(float)
 
-        # factorize any remaining objects
         for c in feat.columns:
             if feat[c].dtype == 'object':
                 feat[c] = pd.factorize(feat[c])[0].astype(float)
 
-        # strict column order
         for c in train_cols:
             if c not in feat.columns: feat[c] = 0.0
         feat = feat[train_cols]
@@ -541,7 +511,6 @@ class MatcherGUI(QWidget):
             .reset_index(drop=True)
         )
 
-        # store full ranking and details for dynamic Top-N export
         self.last_ranking = ranking
         self.last_details_df = details_df
         self.last_id_col = id_col
@@ -552,20 +521,17 @@ class MatcherGUI(QWidget):
         self.log(f"\n{title} (Top {n})")
         self.log(ranking.head(n).to_string(index=False))
 
-    # ---------- open details: EXPORT to XLSX and open via default app (Excel) ----------
     def open_details(self):
         if self.last_ranking is None or self.last_details_df is None or self.last_id_col is None:
             return self._err("No ranking to show. Run Rank first.")
         try:
             n = int(self.top_n.value())
             topn = self.last_ranking.head(n)
-            # join details for export
             try:
                 details = topn.merge(self.last_details_df, on=self.last_id_col, how='left')
             except Exception:
                 details = topn
 
-            # create a temp XLSX (Excel opens XLSX natively; no extra deps)
             tmp = tempfile.NamedTemporaryFile(prefix="topn_", suffix=".xlsx", delete=False)
             tmp_path = tmp.name
             tmp.close()
@@ -579,14 +545,12 @@ class MatcherGUI(QWidget):
                 self.tw = TableWindow(details, f"Top-{n} Details (fallback view)")
                 self.tw.show()
 
-            # also print into the output box
             title = self.last_title or "Top matches"
             self.log(f"\n{title} (Top {n})")
             self.log(topn.to_string(index=False))
         except Exception as e:
             self._err(f"Failed to export/open XLSX:\n{e}")
 
-# ===================== run =====================
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     gui = MatcherGUI()

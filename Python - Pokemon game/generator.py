@@ -23,7 +23,6 @@ EXPECTED_COLUMNS = (
     "Speed",
 )
 
-
 def _load_database():
     if pd is None:
         raise ModuleNotFoundError(
@@ -39,7 +38,6 @@ def _load_database():
         raise ValueError(f"Database is missing expected columns: {', '.join(missing)}")
     return df
 
-
 def _extract_types(record) -> tuple[str, ...]:
     types: List[str] = []
     for column in ("Type 1", "Type 2"):
@@ -51,7 +49,6 @@ def _extract_types(record) -> tuple[str, ...]:
     if not types:
         raise ValueError(f"Pokemon '{record.get('Name', 'Unknown')}' is missing type information")
     return tuple(types)
-
 
 def _row_to_pokemon(record, *, level: Optional[int] = None, gender: Optional[int] = None) -> Pokemon:
     try:
@@ -76,14 +73,12 @@ def _row_to_pokemon(record, *, level: Optional[int] = None, gender: Optional[int
         element=_extract_types(record),
     )
 
-
 def _lookup_record(database, name: str):
     normalised = name.strip().lower()
     matches = database[database["Name"].str.lower() == normalised]
     if matches.empty:
         raise ValueError(f"Pokemon named '{name}' was not found in the database")
     return matches.iloc[0]
-
 
 def _resolve_entry(entry, database, used_names: set[str]) -> Optional[Pokemon]:
     if isinstance(entry, Pokemon):
@@ -98,7 +93,6 @@ def _resolve_entry(entry, database, used_names: set[str]) -> Optional[Pokemon]:
 
     return None
 
-
 def _fill_random_slots(team: List[Optional[Pokemon]], database, used_names: set[str]) -> None:
     available = database[~database["Name"].str.lower().isin(used_names)]
     for index, entry in enumerate(team):
@@ -110,7 +104,6 @@ def _fill_random_slots(team: List[Optional[Pokemon]], database, used_names: set[
             team[index] = pokemon
             used_names.add(pokemon.name.lower())
             available = available[~available["Name"].str.lower().isin(used_names)]
-
 
 def generate_team(P1=None, P2=None, P3=None, P4=None, P5=None, P6=None, random=None) -> List[Pokemon]:
     """Create a list of Pokemon instances sourced from the database."""
@@ -133,5 +126,3 @@ def generate_team(P1=None, P2=None, P3=None, P4=None, P5=None, P6=None, random=N
         raise ValueError(f"Team slots {missing_slots} are unfilled. Provide names or use random=True.")
 
     return [pokemon for pokemon in team if pokemon is not None]
-
-    

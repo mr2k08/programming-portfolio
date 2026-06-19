@@ -7,4 +7,3 @@ class Player:
 class Team:
     def __init__(self,team : list):
         self.team = team
-        

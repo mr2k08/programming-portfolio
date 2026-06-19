@@ -1,5 +1,5 @@
 NATURES = {
-    'Adamant': { 
+    'Adamant': {
         'increase': 'atk',
         'decrease': 'sp_atk',
         'description': 'Increases Attack, Decreases Sp. Attack'
@@ -42,14 +42,13 @@ class Pokemon:
         self.gender= gender
         self.temper=temper
         self.element=element
-        self.atk, self.spd, self.sp_atk ,self.defense ,self.sp_def, self.hp,self.max_hp = stats # stats: tuple len 6
-        self.level=level 
+        self.atk, self.spd, self.sp_atk ,self.defense ,self.sp_def, self.hp,self.max_hp = stats
+        self.level=level
         self.moves=moves
         self.status=status
         self.special_trait=special_trait
         self.nature_effect = None
 
-        # Keep an unmodified snapshot of the incoming stats for reference (e.g. UI, debugging).
         self.base_stats = {
             'atk': self.atk,
             'defense': self.defense,
@@ -114,7 +113,6 @@ class Pokemon:
         }
         return label_map.get(stat_key, stat_key.replace('_', ' ').title())
 
-
 class Attack:
     def __init__(self, name, element, power:int, compatible_elements: tuple, PP: int, acc: int,critical: int, type: str):
         self.name=name
@@ -134,8 +132,7 @@ class SpecialMoves:
         self.effect_scale=effect_scale
         self.acc=acc
 
-
-def critical(user: Pokemon, move: Attack): 
+def critical(user: Pokemon, move: Attack):
     from random import randint
     return randint(1,100)<=move.critical
 
@@ -145,7 +142,6 @@ def miss(user: Pokemon,move):
         return randint(1,100)> (move.acc if user.status!='drowsy' else move.acc+20)
     else:
         return False
-        
 
 class Item:
     def __init__(self, name: str, effect: str, effect_scale: int):
@@ -189,22 +185,20 @@ def cast_buff_nerf(move: SpecialMoves, user: Pokemon, target: Pokemon):
         'def': ['defense', 'sp_def'],
         'spd': ['spd']
     }
-    
+
     affected_pokemon = user if move.effect_target else target
     modifier = 1 if move.effect_target else -1
-    
+
     if move.effect in stat_map:
         print(f"\n{affected_pokemon.name}'s stats changed:")
         for stat in stat_map[move.effect]:
             old_value = getattr(affected_pokemon, stat)
             new_value = old_value + (move.effect_scale * modifier)
             setattr(affected_pokemon, stat, new_value)
-            
-            # Show the change with arrows
+
             change = "↑" if modifier > 0 else "↓"
             print(f"{stat.upper()}: {old_value} {change} {new_value}")
 
-# First, let's create a type effectiveness dictionary
 TYPE_CHART = {
     "normal": {
         "rock": 0.5,
@@ -362,7 +356,6 @@ def get_stab_bonus(attacker_types: tuple, move_type: str) -> float:
     """Calculate Same Type Attack Bonus"""
     return 1.5 if move_type in attacker_types else 1.0
 
-# Restore original attack flow but offset the damage for better in-game accuracy
 def attack(attacker: Pokemon, defender: Pokemon, move):
     if move.PP <= 0:
         return {
@@ -431,6 +424,3 @@ def attack(attacker: Pokemon, defender: Pokemon, move):
         'critical': is_critical,
         'damage': final_damage
     }
-
-# Then in the main.py file, modify the attack section to show effectiveness messages:
-

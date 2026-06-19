@@ -5,7 +5,6 @@ from Player import Player
 
 def create_players():
     """Instantiate the default teams, bags, and players."""
-    # Moves
     precipice_blades = Attack("Precipice Blades", "ground", 120, ("ground",), 5, 85, 10, "physical")
     heat_crash = Attack("Heat Crash", "fire", 100, ("fire",), 10, 100, 10, "physical")
     dragon_claw = Attack("Dragon Claw", "dragon", 80, ("dragon",), 15, 100, 15, "physical")
@@ -56,7 +55,6 @@ def create_players():
     high_horsepower = Attack("High Horsepower", "ground", 95, ("ground", "normal"), 10, 95, 1, "physical")
     facade = Attack("Facade", "normal", 70, ("normal",), 20, 100, 1, "physical")
 
-    # Pokémon
     darkrai = Pokemon(
         "Darkrai",
         1,
@@ -90,7 +88,7 @@ def create_players():
     melmetal = Pokemon(
     "Melmetal",
     0,
-    (143, 34, 65, 143, 90, 874, 874),  # atk, spd, sp_atk, defense, sp_def, hp, max_hp
+    (143, 34, 65, 143, 90, 874, 874),
     70,
     [double_iron_bash, thunder_punch, protect, toxic],
     ("steel",),
@@ -101,14 +99,13 @@ def create_players():
     giratina = Pokemon(
     "Giratina",
     0,
-    (100, 90, 100, 120, 120, 540, 540),  # atk, spd, sp_atk, defense, sp_def, hp, max_hp
+    (100, 90, 100, 120, 120, 540, 540),
     70,
     [shadow_force, dragon_claw, will_o_wisp, protect],
     ("ghost", "dragon"),
     special_trait="Pressure",
     temper="Bold"
     )
-
 
     snorlax = Pokemon(
         "Snorlax",
@@ -204,7 +201,6 @@ def create_players():
     team1 = [darkrai, lugia, groudon, arceus, dialga, snorlax]
     team2 = [giratina, melmetal, gengar, zacian, eternatus, deoxys_attack]
 
-    # Items and bags
     potion = Item("Potion", "heal", 50)
     super_potion = Item("Super Potion", "heal", 100)
     hyper_potion = Item("Hyper Potion", "heal", 200)

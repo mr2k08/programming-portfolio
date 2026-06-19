@@ -1,11 +1,6 @@
-#type: ignore
 import numpy as np
 from math import dist
 from itertools import product
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# GAME STATE
-# ═══════════════════════════════════════════════════════════════════════════════
 
 board = np.array([
     ['bR','bk','bB','bQ','bK','bB','bk','bR'],
@@ -19,21 +14,15 @@ board = np.array([
 ], dtype=object)
 
 castling_rights = {
-    'K':    True,   # white king
-    'R_a':  True,   # white queenside rook col 0
-    'R_h':  True,   # white kingside  rook col 7
+    'K':    True,
+    'R_a':  True,
+    'R_h':  True,
     'bK':   True,
     'bR_a': True,
     'bR_h': True,
 }
 
-en_passant_target = None  # (row, col) or None
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# BACKEND — pure logic, no I/O
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# ── shared utilities ──────────────────────────────────────────────────────────
+en_passant_target = None
 
 def algebraic_reader(move):
     return 8 - int(move[1]), 'abcdefgh'.index(move[0])
@@ -49,8 +38,6 @@ def color_of(piece):
 
 def own_len(color):
     return 1 if color == 'white' else 2
-
-# ── sliding piece helpers ─────────────────────────────────────────────────────
 
 def check_ray(board, start_pos, end_pos, dy, dx):
     y, x = start_pos[0] + dy, start_pos[1] + dx
@@ -74,8 +61,6 @@ def check_diagonal(board, start_pos, end_pos):
     dy = 1 if end_pos[0] > start_pos[0] else -1
     dx = 1 if end_pos[1] > start_pos[1] else -1
     return check_ray(board, start_pos, end_pos, dy, dx)
-
-# ── move legality ─────────────────────────────────────────────────────────────
 
 def isLegal(board, start_pos, end_pos, skip_king_safety=False):
     global en_passant_target
@@ -135,8 +120,6 @@ def isLegal(board, start_pos, end_pos, skip_king_safety=False):
 
     return False
 
-# ── castling ──────────────────────────────────────────────────────────────────
-
 def castle(board, color='white'):
     row    = 7  if color == 'white' else 0
     k_key  = 'K'    if color == 'white' else 'bK'
@@ -185,14 +168,10 @@ def apply_castle(board, color, end_col):
 
     castling_rights[k_key] = False
 
-# ── en passant ────────────────────────────────────────────────────────────────
-
 def apply_en_passant(board, start_pos, end_pos):
     board[end_pos]                  = board[start_pos]
     board[start_pos]                = '-'
     board[start_pos[0], end_pos[1]] = '-'
-
-# ── position update ───────────────────────────────────────────────────────────
 
 def update_position(board, start_pos, end_pos):
     global en_passant_target
@@ -214,8 +193,6 @@ def update_position(board, start_pos, end_pos):
         if start_pos == (0, 7): castling_rights['bR_h'] = False
 
     board[end_pos], board[start_pos] = piece, '-'
-
-# ── check / checkmate / stalemate ─────────────────────────────────────────────
 
 def check_present(board, color='white'):
     ky, kx = np.where(board == ('K' if color == 'white' else 'bK'))
@@ -297,8 +274,6 @@ def getInBetween(board, king_pos, attackers_pos):
             result.append(diag)
     return result
 
-# ── pawn promotion ────────────────────────────────────────────────────────────
-
 def promote_pawn(board, pos, color):
     options = {'q':'Q','r':'R','b':'B','k':'k'} if color == 'white' \
          else {'q':'bQ','r':'bR','b':'bB','k':'bk'}
@@ -308,8 +283,6 @@ def promote_pawn(board, pos, color):
             board[pos] = options[choice]
             return
         print("Invalid choice.")
-
-# ── input validation ──────────────────────────────────────────────────────────
 
 def coord_legal(coord, color='white', start=True):
     if len(coord) != 2 or coord[0] not in 'abcdefgh' \
@@ -330,8 +303,6 @@ def parse_move(raw):
         return raw[:2], raw[2:]
     return None
 
-# ── move notation ─────────────────────────────────────────────────────────────
-
 def move_to_notation(board, start_pos, end_pos, is_castle=None, is_ep=False):
     files = 'abcdefgh'
     if is_castle == 'kingside':  return 'O-O'
@@ -346,8 +317,6 @@ def move_to_notation(board, start_pos, end_pos, is_castle=None, is_ep=False):
     dest = files[end_pos[1]] + str(8 - end_pos[0])
     return f"{sym}{capture}{dest}"
 
-# ── print move history ────────────────────────────────────────────────────────
-
 def print_move_history(move_history):
     if not move_history:
         print("No moves yet.")
@@ -355,10 +324,6 @@ def print_move_history(move_history):
     print("Move history:")
     for i, move in enumerate(move_history, 1):
         print(f"{i}. {move}")
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# GAME LOOP
-# ═══════════════════════════════════════════════════════════════════════════════
 
 def game_loop():
     global board, castling_rights, en_passant_target

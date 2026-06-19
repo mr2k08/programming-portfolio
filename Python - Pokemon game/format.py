@@ -5,7 +5,6 @@ def clear_terminal():
 
 def print_battle_status(player1, player2, current_player):
     print("\n" + "="*70)
-    # Add turn indicator
     print(f"{'Trainer 1' if current_player == player1 else 'Trainer 2'}'s turn!")
     print(f"{player1.current_pokemon.name:^25} VS {player2.current_pokemon.name:^25}")
     print(f"{player1.current_pokemon.nature_summary():^25} VS {player2.current_pokemon.nature_summary():^25}")
@@ -14,16 +13,16 @@ def print_battle_status(player1, player2, current_player):
 
 def print_move_options(pokemon):
     print("\nMoves:")
-    print("-"*70)  # Made wider to accommodate more info
+    print("-"*70)
     for i, move in enumerate(pokemon.moves, 1):
         if isinstance(move, Attack):
             print(f"{i}. {move.name:<15} | Power: {move.power:<3} | PP: {move.PP:<2} | Type: {move.element:<8} | {move.type}")
-        else:  # SpecialMove
+        else:
             effect_type = "Raises" if move.effect_target == 1 else "Lowers"
             target = "self" if move.effect_target == 1 else "opponent"
             print(f"{i}. {move.name:<15} | {effect_type} {move.effect} by {move.effect_scale} ({target}) | Accuracy: {move.acc}")
     print("-"*70)
-    
+
 def print_bag_options(bag):
     print("\nBag:")
     print("-"*50)

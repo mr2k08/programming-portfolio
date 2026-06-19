@@ -1,4 +1,3 @@
-# robotMorpion.py
 from game_logic import col, diag
 
 def fill_in(line: tuple,
@@ -12,13 +11,13 @@ def fill_in(line: tuple,
     """
     empty_index = line.index(' ')
     if is_column:
-        return empty_index, line_index          # (ligne, colonne)
+        return empty_index, line_index
     if is_diagonal:
-        return empty_index, empty_index          # diagonale principale
+        return empty_index, empty_index
     if reverse:
-        return 2 - empty_index, empty_index      # diagonale inversée
+        return 2 - empty_index, empty_index
 
-    return line_index, empty_index               # ligne normale
+    return line_index, empty_index
 
 def botAction(board: list, player: str):
     """
@@ -26,24 +25,19 @@ def botAction(board: list, player: str):
     Retourne une position (ligne, colonne) ou False.
     """
     for line_index in range(3):
-        # Analyse des lignes
         if board[line_index].count(player) == 2 and ' ' in board[line_index]:
             return fill_in(board[line_index], line_index=line_index)
-        # Analyse des colonnes
         column_values = col(board, line_index)
         if column_values.count(player) == 2 and ' ' in column_values:
             return fill_in(column_values, is_column=True, line_index=line_index)
-    # Analyse diagonale principale
     diagonal_values = diag(board)
     if diagonal_values.count(player) == 2 and ' ' in diagonal_values:
         return fill_in(diagonal_values, is_diagonal=True)
-    # Analyse diagonale inversée
     reverse_diagonal_values = diag(board, reverse=True)
     if reverse_diagonal_values.count(player) == 2 and ' ' in reverse_diagonal_values:
         return fill_in(reverse_diagonal_values, reverse=True)
 
     return False
-
 
 def botMove(board: list) -> tuple:
     """
@@ -63,4 +57,4 @@ def botMove(board: list) -> tuple:
     for row_index in range(3):
         for column_index in range(3):
             if board[row_index][column_index] == ' ':
-                return row_index, column_index 
+                return row_index, column_index
