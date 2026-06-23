@@ -6,6 +6,18 @@
 *.so
 output/
 build/
+.build/
+C++ - Trading Backtester/backtester
+
+# Data / large artifacts
+*.parquet
+*.parquet_parsed.csv
+
+# Editor / tooling
+.clangd
+.CMakeLists.txt
+.vscode/
+C++ - Snake/score.txt
 
 # Python
 __pycache__/

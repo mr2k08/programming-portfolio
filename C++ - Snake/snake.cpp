@@ -1,9 +1,9 @@
-#include "SDL_keycode.h"
+#include <SDL2/SDL_keycode.h>
 #include <cstddef>
 #include <ios>
 #include <iostream>
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <deque>
 #include <random>
 #include <tuple>
